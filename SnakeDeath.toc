@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: Snake Death
+## Notes: Addon that plays the sound of a snake dying when you die in WoW.
+## Author: Leon Braun
+## Version: 0.1.0
+
+src/SnakeDeath.lua
