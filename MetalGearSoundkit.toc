@@ -8,4 +8,5 @@
 Core/Sound.lua
 Modules/PlayerSounds.lua
 Modules/LootSounds.lua
+Modules/HealSounds.lua
 Modules/Settings.lua

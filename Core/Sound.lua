@@ -4,6 +4,10 @@ local sounds = {
     { id = "death", file = "death.ogg", label = "Todessound" },
     { id = "releaseGhost", file = "continue.ogg", label = "Wiederbelebung" },
     { id = "itemPickup", file = "itemPickup.ogg", label = "Gegenstand aufgehoben" },
+    { id = "ration", file = "ration.ogg", label = "Heil-Items benutzt" },
+    { id = "intro", file = "intro.ogg", label = "Intro-Sound" },
+    { id = "itemEquip", file = "itemEquip.ogg", label = "Item ausgerüstet" },
+    { id = "itemEquipMGS3", file = "itemEquipMGS3.ogg", label = "Item ausgerüstet (MGS3)" },
 }
 
 if type(MetalGearSoundkitDB) ~= "table" then
@@ -53,7 +57,7 @@ function addon:SetSoundEnabled(soundId, enabled)
     savedSounds[soundId].enabled = enabled
 end
 
-function addon:PlayAddonSound(soundName)
+function addon:PlayAddonSound(soundName, soundChannel)
     local sound = soundsById[soundName]
     if not sound then
         error("Unknown sound: " .. tostring(soundName))
@@ -63,7 +67,7 @@ function addon:PlayAddonSound(soundName)
     end
 
     local soundPath = "Interface\\AddOns\\" .. addonName .. "\\Media\\Sounds\\" .. sound.file
-    local willPlay = PlaySoundFile(soundPath, "Master")
+    local willPlay = PlaySoundFile(soundPath, soundChannel or "Master")
 
     if not willPlay then
         print("|cff505050[MGSoundkit]|r Fehler: Sound konnte nicht abgespielt werden. Pfad prüfen: " .. soundPath)
