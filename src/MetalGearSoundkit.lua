@@ -1,8 +1,8 @@
 addonName, addonTable = ...
 
-local deathSound = "Interface\\AddOns\\SnakeDeath\\sounds\\death.ogg"
-local releaseGhostSound = "Interface\\AddOns\\SnakeDeath\\sounds\\continue.ogg"
-local itemPickupSound = "Interface\\AddOns\\SnakeDeath\\sounds\\itemPickup.ogg"
+local deathSound = "Interface\\AddOns\\MetalGearSoundkit\\sounds\\death.ogg"
+local releaseGhostSound = "Interface\\AddOns\\MetalGearSoundkit\\sounds\\continue.ogg"
+local itemPickupSound = "Interface\\AddOns\\MetalGearSoundkit\\sounds\\itemPickup.ogg"
 
 
 local frame = CreateFrame("Frame")
@@ -18,7 +18,7 @@ local searchPatternMultiple = LOOT_ITEM_SELF_MULTIPLE:gsub("%%s", "(.+)"):gsub("
 
 frame:SetScript("OnEvent", function(self, event, message)
     if event == "PLAYER_LOGIN" then
-        print("|cff505050[SnakeDeath]|r This is Snake. Colonel, can you hear me?")
+        print("|cff505050[MGSoundkit]|r This is Snake. Colonel, can you hear me?")
     elseif event == "PLAYER_DEAD" then
         PlayCustomAddonSound(deathSound)
     elseif event == "PLAYER_ALIVE" then
@@ -49,7 +49,7 @@ function PlayCustomAddonSound(soundPath)
     local willPlay, soundHandle = PlaySoundFile(soundPath, "Master")
     
     if not willPlay then
-        print("|cff505050[SnakeDeath]|r Fehler: Sound konnte nicht abgespielt werden. Pfad prüfen!")
+        print("|cff505050[MGSoundkit]|r Fehler: Sound konnte nicht abgespielt werden. Pfad prüfen!")
     end
 end
 
