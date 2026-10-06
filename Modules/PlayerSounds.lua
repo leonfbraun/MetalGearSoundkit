@@ -18,6 +18,6 @@ frame:SetScript("OnEvent", function(_, event)
     elseif event == "PLAYER_ALIVE" then
         addon:PlayAddonSound("releaseGhost", "SFX")
     elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-        addon:PlayAddonSound("itemEquip", "SFX")
+        addon:PlayAddonSound(addon:GetItemEquipSound(), "SFX")
     end
 end)

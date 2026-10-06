@@ -6,7 +6,8 @@ A World of Warcraft addon that plays Metal Gear-themed sounds for selected in-ga
 
 ```text
 Core/
-  Sound.lua             Shared sound playback and sound registry
+  SoundDefinitions.lua  Sound assets and settings labels
+  Sound.lua             Shared sound playback and settings state
 Media/
   Sounds/               Addon audio assets
 Modules/
@@ -20,7 +21,10 @@ MetalGearSoundkit.toc   Addon metadata and Lua load order
 Lua files are listed explicitly in `MetalGearSoundkit.toc`. The shared sound
 service is loaded before the event modules, which call it through the addon
 namespace. Add new event-specific behavior as a module and register its file in
-the TOC after any code it depends on. Sound enable states are stored in the
-`MetalGearSoundkitDB` saved variable and can be changed in the add-on's settings
-under **Options > AddOns**. The healing potion sound module expects its audio
-file at `Media/Sounds/healPotion.ogg`.
+the TOC after any code it depends on. Sound metadata lives in
+`Core/SoundDefinitions.lua`; audio assets are separate files under
+`Media/Sounds/`. Sound enable states are stored in the `MetalGearSoundkitDB`
+saved variable and can be changed in the add-on's settings under
+**Options > AddOns**. The healing potion sound module expects its audio file at
+`Media/Sounds/healPotion.ogg`. The ItemEquip sound can be selected between the
+MGS1 and MGS3 variants in the same settings panel.

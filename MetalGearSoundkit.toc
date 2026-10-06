@@ -5,6 +5,7 @@
 ## Version: 0.1.0
 ## SavedVariables: MetalGearSoundkitDB
 
+Core/SoundDefinitions.lua
 Core/Sound.lua
 Modules/PlayerSounds.lua
 Modules/LootSounds.lua
