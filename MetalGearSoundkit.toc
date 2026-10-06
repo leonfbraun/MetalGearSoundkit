@@ -1,7 +1,11 @@
 ## Interface: 16001
 ## Title: Metal Gear Soundkit
-## Notes: Addon that plays the sound of a snake dying when you die in WoW.
+## Notes: Plays Metal Gear-themed sounds for in-game events.
 ## Author: Leon Braun
 ## Version: 0.1.0
+## SavedVariables: MetalGearSoundkitDB
 
-src/MetalGearSoundkit.lua
+Core/Sound.lua
+Modules/PlayerSounds.lua
+Modules/LootSounds.lua
+Modules/Settings.lua
