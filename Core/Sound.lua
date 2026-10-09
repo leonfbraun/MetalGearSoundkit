@@ -112,7 +112,7 @@ function addon:PlayAddonSound(soundName, soundChannel)
         error("Unknown sound: " .. tostring(soundName))
     end
     if not self:IsSoundEnabled(sound.settingId) then
-        return
+        return false
     end
 
     local soundPath = "Interface\\AddOns\\" .. addonName .. "\\Media\\Sounds\\" .. sound.file
@@ -121,4 +121,6 @@ function addon:PlayAddonSound(soundName, soundChannel)
     if not willPlay then
         print("|cff505050[MGSoundkit]|r Fehler: Sound konnte nicht abgespielt werden. Pfad prüfen: " .. soundPath)
     end
+
+    return willPlay
 end

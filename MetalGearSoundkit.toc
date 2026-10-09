@@ -7,6 +7,7 @@
 
 Core/SoundDefinitions.lua
 Core/Sound.lua
+Modules/Intro.lua
 Modules/PlayerSounds.lua
 Modules/LootSounds.lua
 Modules/HealSounds.lua

@@ -24,7 +24,7 @@ addon.soundDefinitions = {
     {
         id = "intro",
         file = "intro.ogg",
-        label = "Intro-Sound",
+        label = "Intro",
     },
     {
         id = "itemEquip",
