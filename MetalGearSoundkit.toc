@@ -2,7 +2,7 @@
 ## Title: Metal Gear Soundkit
 ## Notes: Plays Metal Gear-themed sounds for in-game events.
 ## Author: Leon Braun
-## Version: 0.1.0
+## Version: 0.1.2
 ## SavedVariables: MetalGearSoundkitDB
 
 Core/SoundDefinitions.lua

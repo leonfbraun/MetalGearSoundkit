@@ -1,45 +1,61 @@
 local addonName, addon = ...
+local savedSounds
 
-if type(MetalGearSoundkitDB) ~= "table" then
-    MetalGearSoundkitDB = {}
+local function EnsureSavedSoundSettings()
+    if type(MetalGearSoundkitDB) ~= "table" then
+        MetalGearSoundkitDB = {}
+    end
+    if type(MetalGearSoundkitDB.sounds) ~= "table" then
+        MetalGearSoundkitDB.sounds = {}
+    end
+    if MetalGearSoundkitDB.itemEquipSound ~= "itemEquipMGS1"
+        and MetalGearSoundkitDB.itemEquipSound ~= "itemEquipMGS3" then
+        MetalGearSoundkitDB.itemEquipSound = "itemEquipMGS1"
+    end
+
+    savedSounds = MetalGearSoundkitDB.sounds
+    for _, definition in ipairs(addon.soundDefinitions) do
+        local savedSettings = savedSounds[definition.id]
+        if type(savedSettings) ~= "table" then
+            savedSettings = {}
+            savedSounds[definition.id] = savedSettings
+        end
+
+        if type(savedSettings.enabled) ~= "boolean" then
+            local legacyId = definition.variants and MetalGearSoundkitDB.itemEquipSound
+            local legacySettings = legacyId and savedSounds[legacyId]
+            if type(legacySettings) == "table" and type(legacySettings.enabled) == "boolean" then
+                savedSettings.enabled = legacySettings.enabled
+            else
+                savedSettings.enabled = true
+            end
+        end
+    end
 end
-if type(MetalGearSoundkitDB.sounds) ~= "table" then
-    MetalGearSoundkitDB.sounds = {}
-end
-if MetalGearSoundkitDB.itemEquipSound ~= "itemEquipMGS1"
-    and MetalGearSoundkitDB.itemEquipSound ~= "itemEquipMGS3" then
-    MetalGearSoundkitDB.itemEquipSound = "itemEquipMGS1"
-end
+
+EnsureSavedSoundSettings()
+
+local savedVariablesFrame = CreateFrame("Frame")
+savedVariablesFrame:RegisterEvent("ADDON_LOADED")
+savedVariablesFrame:SetScript("OnEvent", function(self, _, loadedAddonName)
+    if loadedAddonName == addonName then
+        -- Recheck after WoW has loaded this addon's SavedVariables.
+        EnsureSavedSoundSettings()
+        self:UnregisterEvent("ADDON_LOADED")
+    end
+end)
 
 local soundsById = {}
 local settingsById = {}
-local settingSounds = {}
-local savedSounds = MetalGearSoundkitDB.sounds
+local soundSettings = {}
 
 for _, definition in ipairs(addon.soundDefinitions) do
-    local settingId = definition.id
     local setting = {
-        id = settingId,
+        id = definition.id,
         label = definition.label,
     }
-    settingSounds[#settingSounds + 1] = setting
-    settingsById[settingId] = setting
-
-    local savedSettings = savedSounds[settingId]
-    if type(savedSettings) ~= "table" then
-        savedSettings = {}
-        savedSounds[settingId] = savedSettings
-    end
-
-    if type(savedSettings.enabled) ~= "boolean" then
-        local legacyId = definition.variants and MetalGearSoundkitDB.itemEquipSound
-        local legacySettings = legacyId and savedSounds[legacyId]
-        if type(legacySettings) == "table" and type(legacySettings.enabled) == "boolean" then
-            savedSettings.enabled = legacySettings.enabled
-        else
-            savedSettings.enabled = true
-        end
-    end
+    soundSettings[#soundSettings + 1] = setting
+    settingsById[setting.id] = setting
 
     local sounds = definition.variants or { definition }
     if definition.variants then
@@ -49,12 +65,12 @@ for _, definition in ipairs(addon.soundDefinitions) do
         soundsById[sound.id] = {
             id = sound.id,
             file = sound.file,
-            settingId = settingId,
+            settingId = setting.id,
         }
     end
 end
 
-addon.sounds = settingSounds
+addon.sounds = soundSettings
 
 function addon:IsSoundEnabled(soundId)
     local sound = settingsById[soundId]

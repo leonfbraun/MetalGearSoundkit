@@ -4,39 +4,36 @@ local panel = CreateFrame("Frame", "MetalGearSoundkitOptionsPanel", UIParent)
 panel.name = "Metal Gear Soundkit"
 panel.checkboxes = {}
 
-local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-title:SetPoint("TOPLEFT", 16, -16)
-title:SetText("Metal Gear Soundkit")
-
-local description = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
-description:SetText("Aktiviere oder deaktiviere einzelne Soundeffekte.")
-
 local itemEquipDropdown
 
-for index, sound in ipairs(addon.sounds) do
-    local soundId = sound.id
-    local rowY = -68 - (index - 1) * 36
+local function CreatePanelHeading()
+    local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", 16, -16)
+    title:SetText(panel.name)
+
+    local description = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
+    description:SetText("Aktiviere oder deaktiviere einzelne Soundeffekte.")
+end
+
+local function OnSoundToggle(self)
+    addon:SetSoundEnabled(self.soundId, self:GetChecked() and true or false)
+end
+
+local function CreateSoundCheckbox(index, sound)
     local checkbox = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
-    checkbox:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, rowY)
+    checkbox:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, -68 - (index - 1) * 36)
     checkbox:SetSize(26, 26)
-    checkbox:SetChecked(addon:IsSoundEnabled(soundId))
+    checkbox.soundId = sound.id
+    checkbox:SetChecked(addon:IsSoundEnabled(sound.id))
+    checkbox:SetScript("OnClick", OnSoundToggle)
 
     local label = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     label:SetPoint("LEFT", checkbox, "RIGHT", 4, 0)
     label:SetText(sound.label)
 
-    if soundId == "itemEquip" then
-        itemEquipDropdown = CreateFrame("Frame", nil, panel, "UIDropDownMenuTemplate")
-        itemEquipDropdown:SetPoint("LEFT", label, "RIGHT", 8, 0)
-        UIDropDownMenu_SetWidth(itemEquipDropdown, 100)
-    end
-
-    checkbox:SetScript("OnClick", function(self)
-        addon:SetSoundEnabled(soundId, self:GetChecked() and true or false)
-    end)
-
-    panel.checkboxes[soundId] = checkbox
+    panel.checkboxes[sound.id] = checkbox
+    return label
 end
 
 local function UpdateItemEquipDropdown()
@@ -51,32 +48,56 @@ local function UpdateItemEquipDropdown()
     end
 end
 
-UIDropDownMenu_Initialize(itemEquipDropdown, function(_, level)
-    if level ~= 1 then
-        return
-    end
+local function OnItemEquipSoundSelected(_, soundId)
+    addon:SetItemEquipSound(soundId)
+    UpdateItemEquipDropdown()
+end
 
-    for _, sound in ipairs(addon.itemEquipSounds) do
-        local soundId = sound.id
-        local info = UIDropDownMenu_CreateInfo()
-        info.text = sound.label
-        info.value = soundId
-        info.func = function()
-            addon:SetItemEquipSound(soundId)
-            UpdateItemEquipDropdown()
+local function CreateItemEquipDropdown(anchor)
+    local dropdown = CreateFrame("Frame", nil, panel, "UIDropDownMenuTemplate")
+    dropdown:SetPoint("LEFT", anchor, "RIGHT", 8, 0)
+    UIDropDownMenu_SetWidth(dropdown, 100)
+
+    UIDropDownMenu_Initialize(dropdown, function(_, level)
+        if level ~= 1 then
+            return
         end
-        info.checked = addon:GetItemEquipSound() == soundId
-        UIDropDownMenu_AddButton(info, level)
+
+        for _, sound in ipairs(addon.itemEquipSounds) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = sound.label
+            info.value = sound.id
+            info.arg1 = sound.id
+            info.func = OnItemEquipSoundSelected
+            info.checked = addon:GetItemEquipSound() == sound.id
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end)
+
+    return dropdown
+end
+
+local function CreateSoundOptions()
+    for index, sound in ipairs(addon.sounds) do
+        local label = CreateSoundCheckbox(index, sound)
+        if sound.id == "itemEquip" then
+            itemEquipDropdown = CreateItemEquipDropdown(label)
+        end
     end
-end)
+end
 
 panel:SetScript("OnShow", function(self)
-    UpdateItemEquipDropdown()
+    if itemEquipDropdown then
+        UpdateItemEquipDropdown()
+    end
 
     for soundId, checkbox in pairs(self.checkboxes) do
         checkbox:SetChecked(addon:IsSoundEnabled(soundId))
     end
 end)
+
+CreatePanelHeading()
+CreateSoundOptions()
 
 local settingsCategory
 local function OpenSettings()

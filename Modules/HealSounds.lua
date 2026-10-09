@@ -1,4 +1,4 @@
-local addonName, addon = ...
+local _, addon = ...
 
 local HEALING_ITEM_SPELLS = {
     -- Healing potions
@@ -36,11 +36,8 @@ local BANDAGE_SPELLS = {
 local frame = CreateFrame("Frame")
 frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 
-frame:SetScript("OnEvent", function(self, event, unit, castGUID, spellID)
-    if unit == "player" then
-        
-        if HEALING_ITEM_SPELLS[spellID] or BANDAGE_SPELLS[spellID] then
-            addon:PlayAddonSound("ration", "SFX")
-        end
+frame:SetScript("OnEvent", function(_, _, unit, _, spellID)
+    if unit == "player" and (HEALING_ITEM_SPELLS[spellID] or BANDAGE_SPELLS[spellID]) then
+        addon:PlayAddonSound("ration", "SFX")
     end
 end)
