@@ -12,9 +12,27 @@ local function GetLootItemLink(message)
     return message:match(multipleItemLootPattern) or message:match(singleItemLootPattern)
 end
 
-frame:SetScript("OnEvent", function(_, _, chatMessage)
-    local itemLink = GetLootItemLink(chatMessage)
+local winPattern = LOOT_ROLL_YOU_WON:gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
+
+frame:SetScript("OnEvent", function(_, _, message)
+    local itemLink = GetLootItemLink(message)
     if itemLink and itemLink:match("item:(%d+)") then
         addon:PlayAddonSound("itemPickup", "SFX")
+    end
+
+    local itemLink, rollValue = message:match(winPattern)
+
+    if itemLink then
+        local itemID = itemLink:match("item:(%d+)")
+        
+        if itemID then
+            local _, _, itemQuality = C_Item.GetItemInfo(itemID)
+            
+            if itemQuality and itemQuality >= 3 then
+                print("BELOHNUNG: Du hast den Roll für " .. itemLink .. " (Rar+) mit einer " .. rollValue .. " gewonnen!")
+                
+                PlaySound(888, "Master")
+            end
+        end
     end
 end)

@@ -131,6 +131,8 @@ registrationFrame:SetScript("OnEvent", function(self, _, loadedAddonName)
         error("No supported interface options registration API found")
     end
 
+    UpdateItemEquipDropdown()
+
     local compartment = _G.AddonCompartmentFrame
     if compartment and compartment.RegisterAddon then
         compartment:RegisterAddon({
