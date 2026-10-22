@@ -12,3 +12,4 @@ Modules/PlayerSounds.lua
 Modules/LootSounds.lua
 Modules/HealSounds.lua
 Modules/Settings.lua
+Modules/CombatSounds.lua
