@@ -12,7 +12,10 @@ Media/
   Sounds/               Audio files referenced by the definitions
 Modules/
   PlayerSounds.lua      Player login, death, resurrection, and equipment events
-  LootSounds.lua        Loot chat events
+  LootSounds.lua        Loot chat events and low-quality loot roll wins
+  GoldSounds.lua        Money gains and Drebin jingles
+  EnterInstanceSounds.lua  Instance entry sound
+  CombatSounds.lua      Boss encounter start sound
   HealSounds.lua        Healing item and bandage spell events
   Settings.lua          Options panel built from the sound definitions
 MetalGearSoundkit.toc   Addon metadata and file load order
@@ -82,3 +85,11 @@ enable states are stored in `MetalGearSoundkitDB.sounds[soundId].enabled` in
 WoW's SavedVariables. Item equipment has two separate settings: the on/off
 state is `sounds.itemEquip.enabled`, while the selected MGS1/MGS3 variant is
 `itemEquipSound`.
+
+Money gains play the small Drebin jingle for amounts below one gold, the medium
+jingle for quest rewards, and the large jingle for amounts of one gold or more.
+Each jingle can be enabled or disabled independently in the settings panel.
+Entering a party or raid instance plays the VR Mission sound, which can also be
+enabled or disabled in the settings panel.
+Starting a boss encounter plays the Alert sound, which can also be enabled or
+disabled in the settings panel.

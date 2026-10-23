@@ -17,6 +17,11 @@ addon.soundDefinitions = {
         label = "Gegenstand aufgehoben",
     },
     {
+        id = "newItem",
+        file = "NewItem.ogg",
+        label = "Neuer Gegenstand (Roll unter Selten)",
+    },
+    {
         id = "ration",
         file = "ration.ogg",
         label = "Heil-Items benutzt",
@@ -25,6 +30,31 @@ addon.soundDefinitions = {
         id = "intro",
         file = "intro.ogg",
         label = "Intro",
+    },
+    {
+        id = "vrMission",
+        file = "VRMission.ogg",
+        label = "VR Mission (Instanz betreten)",
+    },
+    {
+        id = "alert",
+        file = "Alert.ogg",
+        label = "Alert (Bosskampf beginnt)",
+    },
+    {
+        id = "drebinJingleSmall",
+        file = "DrebinJingleSmall.ogg",
+        label = "Drebin-Jingle (Kleingeld)",
+    },
+    {
+        id = "drebinJingleMedium",
+        file = "DrebinJingleMedium.ogg",
+        label = "Drebin-Jingle (Questbelohnung)",
+    },
+    {
+        id = "drebinJingleLarge",
+        file = "DrebinJingleLarge.ogg",
+        label = "Drebin-Jingle (Goldbetrag)",
     },
     {
         id = "itemEquip",

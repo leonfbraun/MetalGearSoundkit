@@ -13,3 +13,5 @@ Modules/LootSounds.lua
 Modules/HealSounds.lua
 Modules/Settings.lua
 Modules/CombatSounds.lua
+Modules/GoldSounds.lua
+Modules/EnterInstanceSounds.lua

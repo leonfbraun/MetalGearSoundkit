@@ -28,10 +28,8 @@ frame:SetScript("OnEvent", function(_, _, message)
         if itemID then
             local _, _, itemQuality = C_Item.GetItemInfo(itemID)
             
-            if itemQuality and itemQuality >= 3 then
-                print("BELOHNUNG: Du hast den Roll für " .. itemLink .. " (Rar+) mit einer " .. rollValue .. " gewonnen!")
-                
-                PlaySound(888, "Master")
+            if itemQuality and itemQuality < 3 then
+                addon:PlayAddonSound("newItem", "SFX")
             end
         end
     end
