@@ -5,6 +5,7 @@ panel.name = "Metal Gear Soundkit"
 panel.checkboxes = {}
 
 local itemEquipDropdown
+local goldDisplayFormatDropdown
 
 local function CreatePanelHeading()
     local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
@@ -77,6 +78,51 @@ local function CreateItemEquipDropdown(anchor)
     return dropdown
 end
 
+local function UpdateGoldDisplayFormatDropdown()
+    local copperOnly = addon:GetGoldDisplayCopperOnly()
+    UIDropDownMenu_SetSelectedValue(goldDisplayFormatDropdown, copperOnly)
+    UIDropDownMenu_SetText(goldDisplayFormatDropdown, copperOnly and "Nur Copper" or "Gold / Silber / Copper")
+end
+
+local function OnGoldDisplayFormatSelected(_, copperOnly)
+    addon:SetGoldDisplayCopperOnly(copperOnly)
+    UpdateGoldDisplayFormatDropdown()
+end
+
+local function CreateGoldDisplayOptions()
+    local heading = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    heading:SetPoint("TOPLEFT", panel, "TOPLEFT", 16, -68 - #addon.sounds * 36 - 12)
+    heading:SetText("Goldanzeige")
+
+    local formatLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    formatLabel:SetPoint("TOPLEFT", heading, "BOTTOMLEFT", 0, -14)
+    formatLabel:SetText("Währungsformat")
+
+    goldDisplayFormatDropdown = CreateFrame("Frame", nil, panel, "UIDropDownMenuTemplate")
+    goldDisplayFormatDropdown:SetPoint("LEFT", formatLabel, "RIGHT", 12, 0)
+    UIDropDownMenu_SetWidth(goldDisplayFormatDropdown, 170)
+    UIDropDownMenu_Initialize(goldDisplayFormatDropdown, function(_, level)
+        if level ~= 1 then
+            return
+        end
+
+        local options = {
+            { value = false, text = "Gold / Silber / Copper" },
+            { value = true, text = "Nur Copper" },
+        }
+        for _, option in ipairs(options) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = option.text
+            info.value = option.value
+            info.arg1 = option.value
+            info.func = OnGoldDisplayFormatSelected
+            info.checked = addon:GetGoldDisplayCopperOnly() == option.value
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end)
+
+end
+
 local function CreateSoundOptions()
     for index, sound in ipairs(addon.sounds) do
         local label = CreateSoundCheckbox(index, sound)
@@ -90,6 +136,9 @@ panel:SetScript("OnShow", function(self)
     if itemEquipDropdown then
         UpdateItemEquipDropdown()
     end
+    if goldDisplayFormatDropdown then
+        UpdateGoldDisplayFormatDropdown()
+    end
 
     for soundId, checkbox in pairs(self.checkboxes) do
         checkbox:SetChecked(addon:IsSoundEnabled(soundId))
@@ -98,6 +147,7 @@ end)
 
 CreatePanelHeading()
 CreateSoundOptions()
+CreateGoldDisplayOptions()
 
 local settingsCategory
 local function OpenSettings()

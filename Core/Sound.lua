@@ -5,6 +5,12 @@ local function EnsureSavedSoundSettings()
     if type(MetalGearSoundkitDB) ~= "table" then
         MetalGearSoundkitDB = {}
     end
+    if type(MetalGearSoundkitDB.goldDisplay) ~= "table" then
+        MetalGearSoundkitDB.goldDisplay = {}
+    end
+    if type(MetalGearSoundkitDB.goldDisplay.copperOnly) ~= "boolean" then
+        MetalGearSoundkitDB.goldDisplay.copperOnly = false
+    end
     if type(MetalGearSoundkitDB.sounds) ~= "table" then
         MetalGearSoundkitDB.sounds = {}
     end
@@ -104,6 +110,18 @@ function addon:SetItemEquipSound(soundId)
     end
 
     MetalGearSoundkitDB.itemEquipSound = soundId
+end
+
+function addon:GetGoldDisplayCopperOnly()
+    return MetalGearSoundkitDB.goldDisplay.copperOnly
+end
+
+function addon:SetGoldDisplayCopperOnly(enabled)
+    if type(enabled) ~= "boolean" then
+        error("Gold display copper-only state must be a boolean")
+    end
+
+    MetalGearSoundkitDB.goldDisplay.copperOnly = enabled
 end
 
 function addon:PlayAddonSound(soundName, soundChannel)

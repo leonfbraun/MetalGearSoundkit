@@ -1,8 +1,8 @@
-local _, addon = ...
+local addonName, addon = ...
 
 -- ===== Einstellungen =====
-local FONT        = "Fonts\\FRIZQT__.TTF"   -- besser: eigene .ttf im Addon-Ordner
-local FONT_SIZE   = 16
+local FONT        = "Interface\\AddOns\\" .. addonName .. "\\Media\\Fonts\\Rajdhani-SemiBold.ttf"
+local FONT_SIZE   = 18
 local COLOR       = { 0.95, 0.90, 0.67 }    -- aus dem Screenshot gemessen
 local OFFSET_X    = -113                    -- Abstand vom rechten Rand
 local OFFSET_Y    = 390                     -- Oberkante des Textblocks, von unten gemessen
@@ -16,23 +16,70 @@ local MAX_ENTRIES = 3
 
 local container = CreateFrame("Frame", nil, UIParent)
 container:SetSize(420, 120)
-container:SetPoint("TOPRIGHT", UIParent, "BOTTOMRIGHT", OFFSET_X, OFFSET_Y)
 container:SetFrameStrata("HIGH")
+local positionedBesideBag
+local hasPosition = false
+
+local function GetLeftmostOpenBag()
+    local leftmostBag
+    local combinedBags = _G["ContainerFrameCombinedBags"]
+    if combinedBags and combinedBags:IsShown() then
+        leftmostBag = combinedBags
+    end
+
+    for index = 1, 13 do
+        local bagFrame = _G["ContainerFrame" .. index]
+        if bagFrame and bagFrame:IsShown() then
+            local bagLeft = bagFrame:GetLeft()
+            local leftmost = leftmostBag and leftmostBag:GetLeft()
+            if bagLeft and (not leftmost or bagLeft < leftmost) then
+                leftmostBag = bagFrame
+            end
+        end
+    end
+
+    return leftmostBag
+end
+
+local function UpdateContainerPosition()
+    local leftmostBag = GetLeftmostOpenBag()
+    if hasPosition and leftmostBag == positionedBesideBag then
+        return
+    end
+
+    container:ClearAllPoints()
+    if leftmostBag then
+        container:SetPoint("TOPRIGHT", leftmostBag, "TOPLEFT", -16, 0)
+    else
+        container:SetPoint("TOPRIGHT", UIParent, "BOTTOMRIGHT", OFFSET_X, OFFSET_Y)
+    end
+    positionedBesideBag = leftmostBag
+    hasPosition = true
+end
+
+UpdateContainerPosition()
 
 local entries, pool = {}, {}
+local bagPositionElapsed = 0
 
 local function FormatMoney(copper)
+    if addon:GetGoldDisplayCopperOnly() then
+        return "+" .. copper .. " C"
+    end
+
     local g = math.floor(copper / 10000)
     local s = math.floor((copper % 10000) / 100)
     local k = copper % 100
     local parts = {}
     if g > 0 then parts[#parts + 1] = g .. "G" end
     if s > 0 then parts[#parts + 1] = s .. "S" end
-    if k > 0 or #parts == 0 then parts[#parts + 1] = k .. "C" end
-    return "+" .. table.concat(parts, " ")
+    if k > 0 or #parts == 0 then parts[#parts + 1] = k .. " C" end
+    return "+" .. table.concat(parts, ", ")
 end
 
 local function AddEntry(line1, line2, soundId)
+    UpdateContainerPosition()
+
     -- Nur ASCII verwenden (kein Ä/Ö/Ü), weil die Tipp-Animation nach Bytes kürzt
     if #entries >= MAX_ENTRIES then
         local old = table.remove(entries, 1)
@@ -43,13 +90,13 @@ local function AddEntry(line1, line2, soundId)
     local fs = table.remove(pool)
     if not fs then
         fs = container:CreateFontString(nil, "OVERLAY")
-        fs:SetFont(FONT, FONT_SIZE, "")
         fs:SetTextColor(COLOR[1], COLOR[2], COLOR[3])
         fs:SetShadowColor(0, 0, 0, 0.8)
         fs:SetShadowOffset(1, -1)
         fs:SetJustifyH("RIGHT")
         fs:SetSpacing(LINE_H - FONT_SIZE)
     end
+    fs:SetFont(FONT, FONT_SIZE, "")
     fs:SetText("")
     fs:SetAlpha(1)
     fs:Show()
@@ -61,6 +108,12 @@ local function AddEntry(line1, line2, soundId)
 end
 
 container:SetScript("OnUpdate", function(self, dt)
+    bagPositionElapsed = bagPositionElapsed + dt
+    if bagPositionElapsed >= 0.25 then
+        bagPositionElapsed = 0
+        UpdateContainerPosition()
+    end
+
     -- Update + abgelaufene entfernen
     for i = #entries, 1, -1 do
         local e = entries[i]
@@ -134,7 +187,12 @@ local function Flush()
 end
 
 local HANDLERS = {
-    PLAYER_ENTERING_WORLD = function() lastMoney = GetMoney() end,
+    PLAYER_ENTERING_WORLD = function()
+        lastMoney = GetMoney()
+        C_Timer.After(0.1, UpdateContainerPosition)
+    end,
+    BAG_OPEN = function() C_Timer.After(0.1, UpdateContainerPosition) end,
+    BAG_CLOSED = function() C_Timer.After(0.1, UpdateContainerPosition) end,
     PLAYER_MONEY = function()
         local now = GetMoney()
         local delta = now - lastMoney
